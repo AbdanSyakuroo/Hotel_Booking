@@ -328,7 +328,7 @@
             <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
                 <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
                 <p class="text-gray-500 text-lg font-semibold">Belum ada data pemesanan</p>
-                <p class="text-gray-400 text-sm mt-2 mb-6">Klik tombol di bawah untuk membuat pemesanan baru</p>
+                <p class="text-gray-400 text-sm mt-2 mb-6">Klik tombol di bawah untuk membuat pemesanan baru.</p>
                 <a href="/order.create" class="inline-block amber-gradient text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:opacity-90 transition-all">
                     <i class="fas fa-plus-circle mr-2"></i>
                     Buat Pemesanan
