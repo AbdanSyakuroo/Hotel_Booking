@@ -1,0 +1,83 @@
+
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use App\Models\Room;
+use Illuminate\Http\Request;
+
+class OrderController extends Controller
+{
+    public function create()
+    {
+        $rooms = Room::all();
+        return view('orders.create', compact('rooms'));
+    }
+
+    public function store(Request $request)
+{
+    $request->validate([
+        'nama_pemesan' => 'required|string',
+        'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+        'nomor_identitas' => 'required|digits:16',
+        'room_id' => 'required|exists:rooms,id',
+        'tanggal_pesan' => 'required|date',
+        'durasi_menginap' => 'required|integer|min:1',
+    ]);
+
+    $room = Room::findOrFail($request->room_id);
+    $harga = $room->price * $request->durasi_menginap;
+
+   
+
+    // Tambahan breakfast
+        if ($request->has('breakfast') && $request->breakfast == 1) {
+            $harga += 80000 * $request->durasi_menginap;
+    }
+    
+ // Diskon 10% jika > 3 hari
+    if ($request->durasi_menginap > 3) {
+        $harga = $harga - ($harga * 0.1);
+    }
+    Order::create([
+        'nama_pemesan' => $request->nama_pemesan,
+        'jenis_kelamin' => $request->jenis_kelamin,
+        'nomor_identitas' => $request->nomor_identitas,
+        'room_id' => $request->room_id,
+        'tanggal_pesan' => $request->tanggal_pesan,
+        'durasi_menginap' => $request->durasi_menginap,
+        'breakfast' => $request->has('breakfast'),
+        'total_bayar' => $harga, // wajib terisi
+    ]);
+
+    return redirect()->back()->with('success', 'Pemesanan berhasil disimpan!');
+}
+
+public function calculate(Request $request)
+{
+    $request->validate([
+        'room_id' => 'required|exists:rooms,id',
+        'durasi_menginap' => 'required|integer|min:1',
+    ]);
+
+    $room = Room::findOrFail($request->room_id);
+    $harga = $room->price * $request->durasi_menginap;
+
+    
+
+        // Tambahan breakfast
+        if ($request->has('breakfast') && $request->breakfast == 1) {
+            $harga += 80000 * $request->durasi_menginap;
+        }
+
+// Diskon 10% jika > 3 hari
+    if ($request->durasi_menginap > 3) {
+        $harga = $harga - ($harga * 0.1);
+    }
+    return response()->json([
+        'total' => $harga,
+        'formatted' => "Rp " . number_format($harga, 0, ',', '.')
+    ]);
+}
+
+}
